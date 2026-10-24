@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HarborWing Air</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 15px;
+        }
+
+        .add-form {
+            margin-bottom: 25px;
+        }
+
+        .add-form label {
+            margin-right: 5px;
+        }
+
+        .add-form input {
+            margin-right: 12px;
+            padding: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #999;
+            padding: 10px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            font-weight: bold;
+        }
+
+        .actions {
+            white-space: nowrap;
+        }
+
+        .actions form {
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .actions input {
+            width: 65px;
+            padding: 5px;
+        }
+
+        button {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .message {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>HarborWing Air</h1>
+    <h2>Reservation Management</h2>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <p class="message">{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <h3>Add Reservation</h3>
+
+    <form class="add-form"
+          action="{{ url_for('add_reservation') }}"
+          method="POST">
+
+        <label for="passenger_id">Passenger ID:</label>
+        <input
+            type="number"
+            id="passenger_id"
+            name="passenger_id"
+            min="1"
+            required
+        >
+
+        <label for="party_size">Party Size:</label>
+        <input
+            type="number"
+            id="party_size"
+            name="party_size"
+            min="1"
+            value="1"
+            required
+        >
+
+        <button type="submit">Add Reservation</button>
+    </form>
+
+    <h3>Reservation Records</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Reservation ID</th>
+                <th>Passenger Name</th>
+                <th>Booking Date</th>
+                <th>Party Size</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation.reservation_id }}</td>
+
+                <td>
+                    {{ reservation.first_name }}
+                    {{ reservation.last_name }}
+                </td>
+
+                <td>{{ reservation.booking_date }}</td>
+
+                <td>{{ reservation.party_size }}</td>
+
+                <td class="actions">
+                    <form
+                        action="{{ url_for('update_reservation', reservation_id=reservation.reservation_id) }}"
+                        method="POST"
+                    >
+                        <input
+                            type="number"
+                            name="party_size"
+                            min="1"
+                            value="{{ reservation.party_size }}"
+                            aria-label="New party size"
+                            required
+                        >
+                        <button type="submit">Update</button>
+                    </form>
+
+                    <form
+                        action="{{ url_for('delete_reservation', reservation_id=reservation.reservation_id) }}"
+                        method="POST"
+                        onsubmit="return confirm('Are you sure you want to delete this reservation?');"
+                    >
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5">No reservations found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
